@@ -60,3 +60,8 @@ Il Service Worker mantiene in cache il guscio grafico dell'app: **contenuti Supa
 ### Perché non inviare subito push a sito chiuso?
 
 GitHub Pages ospita solo file statici: non può eseguire codice server per mandare Web Push. Occorrono un server di invio, registrazione dei dispositivi e credenziali segrete conservate lato server. Un calendario Google dentro iframe non permette di intercettare direttamente la creazione di eventi. È necessario un secondo passaggio di configurazione lato backend prima di promettere questo comportamento agli studenti.
+
+
+## Notifiche più rapide (nuova architettura)
+
+Il servizio Edge di Supabase e la verifica calendario ogni minuto sono stati aggiunti al repository, ma **non si attivano solo pubblicando su GitHub**. Eseguire la procedura in [`ATTIVAZIONE_NOTIFICHE_IMMEDIATE.md`](./ATTIVAZIONE_NOTIFICHE_IMMEDIATE.md). Il precedente workflow GitHub resta disponibile come soluzione di transizione fino a quando non viene impostato `HUB_DELIVERY_MODE=supabase` in GitHub Actions Variables. Le notifiche Android usano `site/assets/badge-96.png` con soltanto «5A» bianco su trasparenza.

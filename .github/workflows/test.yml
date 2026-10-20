@@ -1,0 +1,26 @@
+name: 5AHub · Test codice
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'server/**'
+      - 'database/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript and service worker syntax
+        run: |
+          node --check site/assets/app.js
+          node --check site/assets/push.js
+          node --check site/sw.js
+          node --check server/worker.mjs

@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: '3/10 * * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'server/**'
+      - '.github/workflows/notifications.yml'
 permissions:
   contents: read
 concurrency:

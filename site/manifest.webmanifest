@@ -1,0 +1,62 @@
+{
+  "id": "./",
+  "name": "5AHub — Portale della classe 5A",
+  "short_name": "5AHub",
+  "description": "Calendario, maturità, orientamento, assemblee e comunicazioni della classe 5A.",
+  "lang": "it-IT",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f8fb",
+  "theme_color": "#111e32",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Calendario",
+      "short_name": "Calendario",
+      "url": "./#/calendario",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Materiali maturità",
+      "short_name": "Maturità",
+      "url": "./#/maturita",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Segnala",
+      "short_name": "Segnala",
+      "url": "./#/segnala",
+      "icons": [
+        {
+          "src": "assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

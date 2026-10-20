@@ -22,7 +22,7 @@ create table if not exists public.hub_materials (
 );
 create table if not exists public.hub_posts (
   id uuid primary key default gen_random_uuid(),
-  kind text not null check (kind in ('announcement','opportunity','trip','dinner','assembly')),
+  kind text not null check (kind in ('announcement','opportunity','assembly')),
   title text not null check (char_length(trim(title)) between 1 and 160),
   body text not null default '' check (char_length(body) <= 3000),
   event_date date,
@@ -31,13 +31,6 @@ create table if not exists public.hub_posts (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-create table if not exists public.hub_weekly (
-  id integer primary key default 1 check (id=1),
-  content text not null default '' check (char_length(content) <= 5000),
-  updated_at timestamptz not null default now()
-);
-insert into public.hub_weekly(id,content) values (1,'') on conflict (id) do nothing;
-
 -- Per chi aveva gia' eseguito lo schema riservato, aggiunge l'ownership senza cancellare i contenuti.
 alter table public.hub_materials add column if not exists author_id uuid references auth.users(id) on delete set null default auth.uid();
 alter table public.hub_posts add column if not exists author_id uuid references auth.users(id) on delete set null default auth.uid();
@@ -76,7 +69,6 @@ end; $$;
 
 drop trigger if exists hub_materials_updated_at on public.hub_materials;
 drop trigger if exists hub_posts_updated_at on public.hub_posts;
-drop trigger if exists hub_weekly_updated_at on public.hub_weekly;
 drop trigger if exists hub_materials_before_insert on public.hub_materials;
 drop trigger if exists hub_posts_before_insert on public.hub_posts;
 create trigger hub_materials_before_insert before insert on public.hub_materials for each row execute function private.hub_before_insert();
@@ -86,7 +78,6 @@ create trigger hub_posts_updated_at before update on public.hub_posts for each r
 
 alter table public.hub_materials enable row level security;
 alter table public.hub_posts enable row level security;
-alter table public.hub_weekly enable row level security;
 
 -- Rimuove le vecchie policy per l'area rappresentanti e gli eventuali duplicati.
 drop policy if exists "anyone_can_read_materials" on public.hub_materials;
@@ -115,15 +106,8 @@ create policy "hub_author_insert_posts" on public.hub_posts for insert to authen
 create policy "hub_author_update_posts" on public.hub_posts for update to authenticated using (author_id = (select auth.uid())) with check (author_id = (select auth.uid()));
 create policy "hub_author_delete_posts" on public.hub_posts for delete to authenticated using (author_id = (select auth.uid()));
 
--- Agenda settimanale: lettura pubblica, modifica riservata nel backend.
--- Tutti possono invece pubblicare promemoria nelle comunicazioni.
-drop policy if exists "anyone_can_read_weekly" on public.hub_weekly;
-drop policy if exists "admins_can_update_weekly" on public.hub_weekly;
-drop policy if exists "hub_everyone_read_weekly" on public.hub_weekly;
-create policy "hub_everyone_read_weekly" on public.hub_weekly for select to anon, authenticated using (true);
-
-revoke all on public.hub_materials,public.hub_posts,public.hub_weekly from anon, authenticated;
-grant select on public.hub_materials,public.hub_posts,public.hub_weekly to anon, authenticated;
+revoke all on public.hub_materials,public.hub_posts from anon, authenticated;
+grant select on public.hub_materials,public.hub_posts to anon, authenticated;
 grant insert,update,delete on public.hub_materials, public.hub_posts to authenticated;
 
 insert into storage.buckets(id,name,public,file_size_limit,allowed_mime_types)
@@ -163,8 +147,5 @@ do $$ begin
  end if;
  if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='hub_posts') then
    alter publication supabase_realtime add table public.hub_posts;
- end if;
- if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='hub_weekly') then
-   alter publication supabase_realtime add table public.hub_weekly;
  end if;
 end $$;

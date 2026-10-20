@@ -13,3 +13,41 @@
 .form-fallback h3{font-size:clamp(19px,2vw,25px);margin:11px 0 9px;letter-spacing:-.6px}
 .form-fallback p{font-size:13px;color:var(--slate);max-width:380px;line-height:1.75;margin-bottom:22px}
 .form-fallback .help{margin-top:13px;color:var(--muted);font-size:11px}
+
+/* 5AHub: calendario e segnalazioni a tutta larghezza. */
+.calendar-card{padding:12px}
+.calendar-card .cal-shell iframe{height:min(78vh,850px);min-height:610px}
+.report-card{padding:22px}
+.report-card .formframe{min-height:810px;height:90vh;max-height:1100px}
+@media(max-width:680px){.calendar-card{padding:6px}.calendar-card .cal-shell iframe{height:660px;min-height:0}.report-card{padding:12px}.report-card .formframe{height:880px;min-height:0}}
+
+/* PWA installation and notification center */
+.topbar-tools{display:flex;align-items:center;gap:8px}
+.top-tool{border:1px solid #d9e3ec;background:#fff;color:#243f58;border-radius:10px;padding:9px 11px;display:inline-flex;align-items:center;justify-content:center;gap:7px;font:600 12px 'DM Sans',sans-serif;cursor:pointer;min-height:38px}
+.top-tool:hover,.top-tool:focus-visible{background:#f1f7fb;border-color:#abc4d7}
+.notifications-anchor{position:relative}
+.notification-tool{position:relative}
+.notice-count{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;border-radius:50px;background:#d44552;color:white;font-size:10px;line-height:19px;text-align:center;padding:0 4px}
+.notice-popover{position:absolute;top:calc(100% + 12px);right:0;z-index:150;background:white;border:1px solid #dbe4ed;border-radius:15px;box-shadow:0 20px 65px rgba(19,47,72,.16);width:min(380px,calc(100vw - 24px));padding:15px;text-align:left}
+.notice-popover-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:15px}
+.notice-subtitle{font-size:12px;color:#657b8b;margin:4px 0 12px}
+.notice-popover-list{max-height:290px;overflow-y:auto;border-top:1px solid #edf1f5;border-bottom:1px solid #edf1f5}
+.notice-entry{width:100%;display:flex;align-items:center;gap:10px;padding:12px 4px;border:0;border-bottom:1px solid #eef2f5;background:transparent;text-align:left;color:#163148;cursor:pointer}
+.notice-entry:last-child{border-bottom:0}
+.notice-entry:hover{background:#f5f9fc}
+.notice-entry>span:nth-child(2){flex:1;min-width:0}
+.notice-entry strong{display:block;font-size:12px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.notice-entry small{display:block;color:#6f8595;font-size:11px;margin-top:2px}
+.notice-entry-mark{height:7px;width:7px;border-radius:50%;background:#dfe8ef;flex-shrink:0}
+.notice-entry.new .notice-entry-mark{background:#218cb0}
+.notice-popover-bottom{display:flex;flex-direction:column;align-items:flex-start;gap:7px;padding-top:12px}
+.notice-popover-bottom small{line-height:1.5;font-size:11px;color:#657b8b}
+.install-modal{max-width:440px}
+.install-body{padding:16px 22px}
+.install-mark{background:#152b44;color:white;border-radius:15px;width:62px;height:62px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;margin-bottom:15px}
+.install-body h3{margin:0 0 8px;font-size:20px}
+.install-body p,.install-body li{font-size:13px;color:#536d82;line-height:1.7}
+.install-body ol{padding-left:22px;margin:16px 0}
+.install-body li{margin-bottom:8px}
+.install-body .install-caveat{font-size:11px;color:#8796a4}
+@media(max-width:650px){.top-tool.install-tool{padding:9px}.top-tool.install-tool span{display:none}.top-date{display:none}.notice-popover{right:-58px}}

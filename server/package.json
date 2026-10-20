@@ -1,0 +1,1 @@
+{"name":"5ahub-push-worker","private":true,"version":"1.0.0","type":"module","engines":{"node":">=22"},"dependencies":{"web-push":"3.6.7"},"scripts":{"start":"node worker.mjs","check":"node --check worker.mjs"}}

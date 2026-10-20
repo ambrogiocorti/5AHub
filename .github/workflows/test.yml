@@ -6,6 +6,8 @@ on:
       - 'site/**'
       - 'server/**'
       - 'database/**'
+      - 'supabase/**'
+      - 'tests/**'
       - '.github/workflows/**'
   workflow_dispatch:
 permissions:
@@ -24,3 +26,8 @@ jobs:
           node --check site/assets/push.js
           node --check site/sw.js
           node --check server/worker.mjs
+      - name: Test Google Calendar parser
+        run: |
+          node --experimental-strip-types --check supabase/functions/hub-notifications/index.ts
+          node --experimental-strip-types --check supabase/functions/hub-notifications/calendar.ts
+          node --experimental-strip-types --test tests/calendar.test.mjs

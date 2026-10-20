@@ -1,0 +1,2 @@
+[functions.hub-notifications]
+verify_jwt = false

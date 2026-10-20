@@ -92,7 +92,7 @@ async function deviceNotice(item){
  if(!state.notifyOptIn||!('Notification' in window)||Notification.permission!=='granted'||document.visibilityState==='visible')return;
  try{if(window.HUB_PUSH && state.notifyOptIn)return;
   const registration=await navigator.serviceWorker?.ready;
-  if(registration?.showNotification)await registration.showNotification('5AHub · '+item.detail,{body:item.title,icon:'assets/icon-192.png',tag:item.id,data:{url:new URL('./#/'+item.route,location.href).href}});
+  if(registration?.showNotification)await registration.showNotification('5AHub · '+item.detail,{body:item.title,icon:'assets/icon-192.png',badge:'assets/badge-96.png',tag:item.id,data:{url:new URL('./#/'+item.route,location.href).href}});
  }catch(err){console.warn('Notifica dispositivo non disponibile',err)}
 }
 function processRecentContent(posts,mats){

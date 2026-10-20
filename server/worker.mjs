@@ -7,7 +7,12 @@ if(missing.length){console.error('Missing secrets:',missing.join(','));process.e
 const url=E.SUPABASE_URL.replace(/\/$/,'');
 if(!/^https:\/\/[a-z0-9.-]+\.supabase\.co$/i.test(url))throw Error('Invalid Supabase URL');
 const site=new URL(E.SITE_URL||'https://ambrogiocorti.github.io/5AHub/');
-push.setVapidDetails(E.VAPID_SUBJECT,E.VAPID_PUBLIC_KEY,E.VAPID_PRIVATE_KEY);
+// VAPID requires an https URL or a mailto: address; do not print secret values to logs.
+const configuredSubject=String(E.VAPID_SUBJECT||'').trim();
+const validSubject=/^https:\/\/\S+$/i.test(configuredSubject) || /^mailto:[^@\s]+@[^@\s]+\.[^@\s]+$/i.test(configuredSubject);
+const subject=validSubject?configuredSubject:site.href;
+if(!validSubject)console.warn('VAPID_SUBJECT is not a valid HTTPS URL or mailto address; using the public 5AHub site URL instead.');
+push.setVapidDetails(subject,E.VAPID_PUBLIC_KEY,E.VAPID_PRIVATE_KEY);
 async function api(path,method='GET',body){
  const reply=await fetch(url+'/rest/v1/'+path,{
   method,

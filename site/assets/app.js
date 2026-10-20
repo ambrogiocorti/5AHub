@@ -85,12 +85,13 @@ function noticeCenter(){if(!state.notificationPanel)return '';
  <p class="notice-subtitle">Nuovi contenuti condivisi su 5AHub.</p>
  <div class="notice-popover-list">${state.notifications.length?state.notifications.slice(0,15).map(n=>`<button class="notice-entry ${!n.read?'new':''}" data-action="open-notice" data-id="${esc(n.id)}"><span class="notice-entry-mark"></span><span><strong>${esc(n.title)}</strong><small>${esc(n.detail)}</small></span>${icon('chevron',15)}</button>`).join(''):empty('Nessun nuovo contenuto','Quando qualcuno pubblica una novità, la troverai qui.')}</div>
  <div class="notice-popover-bottom">${'Notification' in window && 'serviceWorker' in navigator?
- `<button class="button secondary small" data-action="enable-device-notices">${icon('bell',14)} ${state.notifyOptIn?'Avvisi sul dispositivo attivi':'Attiva avvisi sul dispositivo'}</button>`:
+ `<button class="button secondary small" data-action="enable-device-notices">${icon('bell',14)} ${state.notifyOptIn?'Disattiva notifiche push':'Attiva notifiche push'}</button><button class="button muted small" data-action="push-preferences">Preferenze</button>`:
  `<small>Il tuo browser non supporta gli avvisi del dispositivo.</small>`}
- <small>Gli avvisi automatici funzionano quando 5AHub rimane aperto. Le notifiche a sito chiuso richiedono un servizio push aggiuntivo.</small></div></div>`}
+ <small>Dopo la configurazione del servizio push, gli avvisi arriveranno anche con l’app chiusa.</small></div></div>`}
 async function deviceNotice(item){
  if(!state.notifyOptIn||!('Notification' in window)||Notification.permission!=='granted'||document.visibilityState==='visible')return;
- try{const registration=await navigator.serviceWorker?.ready;
+ try{if(window.HUB_PUSH && state.notifyOptIn)return;
+  const registration=await navigator.serviceWorker?.ready;
   if(registration?.showNotification)await registration.showNotification('5AHub · '+item.detail,{body:item.title,icon:'assets/icon-192.png',tag:item.id,data:{url:new URL('./#/'+item.route,location.href).href}});
  }catch(err){console.warn('Notifica dispositivo non disponibile',err)}
 }
@@ -113,16 +114,13 @@ function processRecentContent(posts,mats){
  writeStored(LAST_CHECK,now);
 }
 async function handleDeviceNotices(){
- if(!('Notification' in window)||!('serviceWorker' in navigator)){toast('Le notifiche del dispositivo non sono disponibili qui');return}
- if(/iPad|iPhone|iPod/.test(navigator.userAgent)&&!hasAppInstalled()){
-  toast('Su iPhone installa prima 5AHub dalla schermata Home');return;
- }
- if(Notification.permission==='denied'){toast('Le notifiche sono bloccate nelle impostazioni del browser');return;}
- if(Notification.permission==='granted'&&state.notifyOptIn){state.notifyOptIn=false;writeStored(NOTIFY_PREF,false);toast('Avvisi disattivati');render();return}
- // Richiesta dal clic dell'utente, mai automaticamente.
- const permission=await Notification.requestPermission();
- state.notifyOptIn=permission==='granted';writeStored(NOTIFY_PREF,state.notifyOptIn);
- toast(state.notifyOptIn?'Avvisi abilitati quando 5AHub è aperto':'Notifiche non abilitate');render();
+ const service=window.HUB_PUSH;
+ if(!service){toast('Servizio notifiche non ancora pronto');return;}
+ const result=await service.toggle({db,userId:state.user?.id});
+ state.notifyOptIn=Boolean(result.enabled);
+ writeStored(NOTIFY_PREF,state.notifyOptIn);
+ toast(result.message);
+ render();
 }
 function installGuide(){const isApple=/iPhone|iPad|iPod/.test(navigator.userAgent);return `<div class="modal-overlay" data-action="outside"><div class="modal install-modal" role="dialog" aria-modal="true" aria-labelledby="install-title"><div class="modal-head"><h2 id="install-title">Installa 5AHub</h2><button class="button muted icon" data-action="close-install" aria-label="Chiudi">${icon('close')}</button></div><div class="install-body"><div class="install-mark">5A</div><h3>La tua classe, come un'app.</h3><p>Apri 5AHub dalla schermata Home, senza cercare il link nel browser.</p>${isApple?`<ol><li>Apri questo sito su Safari.</li><li>Tocca <strong>Condividi</strong>.</li><li>Seleziona <strong>Aggiungi alla schermata Home</strong>, quindi conferma.</li></ol>`:`<ol><li>Apri il menu del browser.</li><li>Seleziona <strong>Installa app</strong> oppure <strong>Aggiungi a schermata Home</strong>.</li><li>Conferma l'installazione.</li></ol>`}<p class="install-caveat">Calendario e contenuti condivisi richiedono una connessione internet.</p></div><div class="actions-end"><button class="button primary" data-action="close-install">Ho capito</button></div></div></div>`}
 
@@ -203,6 +201,7 @@ root.addEventListener('click',async e=>{const control=e.target.closest('[data-ac
  if(action==='read-notifications'){state.notifications=state.notifications.map(n=>({...n,read:true}));writeStored(ALERT_CACHE,state.notifications);render();return}
  if(action==='open-notice'){const item=state.notifications.find(n=>n.id===id);if(item){item.read=true;writeStored(ALERT_CACHE,state.notifications);state.notificationPanel=false;location.hash='#/'+item.route;render()}return}
  if(action==='enable-device-notices'){await handleDeviceNotices();return}
+ if(action==='push-preferences'){await window.HUB_PUSH?.openPreferences({db,userId:state.user?.id});return}
  if(action==='outside'){if(e.target===control){state.modal=null;state.installGuide=false;render()}return}if(action==='open-menu'){state.menu=true;render();return}if(action==='close-menu'){state.menu=false;render();return}if(action==='close-modal'){state.modal=null;render();return}
  if(action==='set-filter'){state.filter=control.dataset.filter;render();return}
  if(action==='new-material'){state.modal={type:'material'};render();return}if(action==='edit-material'){state.modal={type:'material',id};render();return}

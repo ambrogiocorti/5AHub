@@ -1,0 +1,44 @@
+name: 5AHub · Distribuisci notifiche Supabase
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verifica Secrets obbligatori
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          HUB_WEBHOOK_SECRET: ${{ secrets.HUB_WEBHOOK_SECRET }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          CALENDAR_ICAL_URL: ${{ secrets.CALENDAR_ICAL_URL }}
+        shell: bash
+        run: |
+          for key in SUPABASE_ACCESS_TOKEN HUB_WEBHOOK_SECRET VAPID_PUBLIC_KEY VAPID_PRIVATE_KEY CALENDAR_ICAL_URL; do
+            if [[ -z "${!key}" ]]; then echo "::error title=Secret mancante::Configura $key in Repository Secrets."; exit 1; fi
+          done
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.84.2
+      - name: Pubblica Edge Function
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: supabase functions deploy hub-notifications --project-ref jpnisxmmhmrfyhicwtbh --no-verify-jwt
+      - name: Configura Secrets Edge Function
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          HUB_WEBHOOK_SECRET: ${{ secrets.HUB_WEBHOOK_SECRET }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          CALENDAR_ICAL_URL: ${{ secrets.CALENDAR_ICAL_URL }}
+        shell: bash
+        run: |
+          supabase secrets set --project-ref jpnisxmmhmrfyhicwtbh \
+            "HUB_WEBHOOK_SECRET=$HUB_WEBHOOK_SECRET" \
+            "VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY" \
+            "VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY" \
+            "VAPID_SUBJECT=https://ambrogiocorti.github.io/5AHub/" \
+            "CALENDAR_ICAL_URL=$CALENDAR_ICAL_URL"

@@ -7,7 +7,7 @@ import {readIcalEvents, sha256} from './calendar.ts';
 
 const env=(k: string)=>Deno.env.get(k)?.trim()||'';
 const PROJECT=env('SUPABASE_URL').replace(/\/$/,'');
-const SERVICE_KEY=env('SUPABASE_SERVICE_ROLE_KEY');
+const SERVICE_KEY=env('SUPABASE_SERVICE_ROLE_KEY')||(()=>{try{return JSON.parse(env('SUPABASE_SECRET_KEYS')).default||''}catch{return ''}})();
 const WEBHOOK_SECRET=env('HUB_WEBHOOK_SECRET');
 const SITE='https://ambrogiocorti.github.io/5AHub/';
 const MAX_ATTEMPTS=7;
@@ -16,8 +16,10 @@ type Item={id:number;category:string;title:string;body:string;route:string;autho
 type Subscriber={endpoint:string;user_id:string;p256dh:string;auth_secret:string;notify_calendar:boolean;notify_content:boolean};
 
 function requireSettings(){
-  const missing=['SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY','HUB_WEBHOOK_SECRET','VAPID_PUBLIC_KEY','VAPID_PRIVATE_KEY'].filter(x=>!env(x));
+  const missing=['SUPABASE_URL','HUB_WEBHOOK_SECRET','VAPID_PUBLIC_KEY','VAPID_PRIVATE_KEY'].filter(x=>!env(x));
+  if(!SERVICE_KEY)missing.push('SUPABASE_SERVICE_ROLE_KEY o SUPABASE_SECRET_KEYS');
   if(missing.length)throw new Error('Impostazioni mancanti: '+missing.join(', '));
+  if(WEBHOOK_SECRET.length<32)throw new Error('HUB_WEBHOOK_SECRET deve contenere almeno 32 caratteri');
   if(!/^https:\/\/[a-z0-9.-]+\.supabase\.co$/i.test(PROJECT))throw Error('SUPABASE_URL non valido');
   const subject=env('VAPID_SUBJECT');
   webpush.setVapidDetails((/^mailto:[^\s@]+@[^\s@]+\.[^\s@]+$/i.test(subject)||/^https:\/\//i.test(subject))?subject:SITE,env('VAPID_PUBLIC_KEY'),env('VAPID_PRIVATE_KEY'));
@@ -34,7 +36,7 @@ async function validSecret(given: string):Promise<boolean>{
 
 async function request(path:string,method='GET',data?:unknown):Promise<any>{
   const res=await fetch(PROJECT+'/rest/v1/'+path,{
-    method,headers:{'apikey':SERVICE_KEY,'Authorization':'Bearer '+SERVICE_KEY,'Content-Type':'application/json',...(method==='GET'?{}:{'Prefer':'return=representation'})},
+    method,headers:{'apikey':SERVICE_KEY,...(SERVICE_KEY.startsWith('eyJ')?{'Authorization':'Bearer '+SERVICE_KEY}:{}),'Content-Type':'application/json',...(method==='GET'?{}:{'Prefer':'return=representation'})},
     ...(data===undefined?{}:{body:JSON.stringify(data)}), signal:AbortSignal.timeout(16000)
   });
   if(!res.ok)throw Error(`Database ${res.status} ${path.split('?')[0]}: ${(await res.text()).slice(0,200)}`);

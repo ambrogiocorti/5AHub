@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   notify:
-    if: ${{ vars.HUB_PUSH_READY == 'true' }}
+    if: ${{ vars.HUB_PUSH_READY == 'true' && vars.HUB_DELIVERY_MODE != 'supabase' }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:

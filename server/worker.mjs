@@ -1,4 +1,4 @@
-import push from 'web-push';
+import * as push from 'web-push';
 import {createHash} from 'node:crypto';
 const E=process.env;
 const needed=['SUPABASE_URL','SUPABASE_SERVICE_ROLE_KEY','VAPID_PUBLIC_KEY','VAPID_PRIVATE_KEY','VAPID_SUBJECT'];
@@ -12,7 +12,7 @@ async function api(path,method='GET',body){
  const reply=await fetch(url+'/rest/v1/'+path,{
   method,
   headers:{apikey:E.SUPABASE_SERVICE_ROLE_KEY,Authorization:'Bearer '+E.SUPABASE_SERVICE_ROLE_KEY,
-   'Content-Type':'application/json',Prefer:'return=minimal'+(path.includes('on_conflict=')?',resolution=ignore-duplicates':'')},
+   'Content-Type':'application/json',...(method==='GET'?{}:{Prefer:'return=minimal'+(path.includes('on_conflict=')?',resolution=ignore-duplicates':'')})},
   ...(body===undefined?{}:{body:JSON.stringify(body)}),
   signal:AbortSignal.timeout(20000)
  });

@@ -8,5 +8,6 @@ window.HUB_CONFIG = Object.freeze({
   googleFormUrl: 'https://forms.gle/4tEuYRrfu2mR6uXE9',
   googleFormEmbed: 'https://docs.google.com/forms/d/e/1FAIpQLSePQsQrurtebmqdyg72B43WlZZ-x6_t73oKRnFKI2NMbg736g/viewform?embedded=true', // URL del modulo Google incorporato
   className: '5A',
+  vapidPublicKey: 'BP5rys731p0Np-tS9SmEtk6-3h_z-SLHDU7TnCuedcqtTQwOdN-6KdkET3yQnU7-JrV2rZFht0HLGeyX8pijW-g',
   academicYear: '2026/27'
 });

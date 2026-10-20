@@ -82,3 +82,16 @@ Se compare “Pubblicazione momentaneamente non disponibile”, controlla che **
 Il link al sito non limita l'accesso alla sola classe. I file nel bucket di archiviazione sono **pubblici**. Non usarlo per segnalazioni personali o delicate: per quelle utilizza il modulo Segnala o i canali scolastici appropriati, facendo attenzione ai dati inseriti.
 
 Per esigenze di moderazione e ripristino dei contenuti, può essere utile attivare una revisione delle pubblicazioni prima che vengano mostrate: questa versione **non include moderazione preventiva**.
+
+### Se compare «Pubblicazione momentaneamente non disponibile»
+
+Nelle impostazioni **Authentication → Providers / Sign In & Sign Up** del progetto Supabase corretto:
+
+- **Allow new users to sign up: ON**. Serve anche alla creazione automatica degli utenti anonimi.
+- **Allow anonymous sign-ins: ON**. È il metodo utilizzato da `signInAnonymously()`.
+- **Allow manual linking:** non necessario.
+- **Confirm email:** irrilevante per gli accessi anonimi (non viene usata un'email).
+
+Salva le modifiche, aggiorna la pagina web forzando il caricamento (Ctrl+F5) e leggi l'eventuale nuovo messaggio. Se hai attivato **CAPTCHA** nel backend, la sola attivazione della funzione non basta: devi integrare il CAPTCHA nella procedura di accesso anonimo sul sito e inviare `captchaToken`.
+
+Se appare un errore di RLS o «permission denied», verifica che lo schema SQL più recente sia stato eseguito nel **progetto collegato a `site/config.js`**. Il sito è pubblico e chiunque conosca il link potrebbe creare contributi: valuta moderazione e protezione antispam.

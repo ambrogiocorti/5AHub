@@ -1,0 +1,34 @@
+name: 5AHub · Notifiche push
+on:
+  schedule:
+    - cron: '3/10 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: 5ahub-push
+  cancel-in-progress: false
+jobs:
+  notify:
+    if: ${{ vars.HUB_PUSH_READY == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned Web Push dependency
+        working-directory: server
+        run: npm install --no-save --ignore-scripts --no-audit --no-fund --save-exact web-push@3.6.7
+      - name: Dispatch notifications
+        working-directory: server
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          CALENDAR_ICAL_URL: ${{ secrets.CALENDAR_ICAL_URL }}
+          SITE_URL: https://ambrogiocorti.github.io/5AHub/
+        run: node worker.mjs

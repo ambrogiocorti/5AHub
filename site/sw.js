@@ -1,7 +1,7 @@
 /* 5AHub — applicazione installabile / supporto offline e push (ricezione di Web Push) */
-const CACHE_NAME='5ahub-shell-v7-push-20261020';
+const CACHE_NAME='5ahub-shell-v8-badge-20261020';
 const SCOPE=new URL(self.registration.scope);
-const SHELL=['./','./index.html','./assets/style.css','./assets/app.js','./assets/push.js','./config.js','./manifest.webmanifest','./assets/icon-192.png','./assets/icon-512.png','./assets/favicon.svg'];
+const SHELL=['./','./index.html','./assets/style.css','./assets/app.js','./assets/push.js','./config.js','./manifest.webmanifest','./assets/icon-192.png','./assets/icon-512.png','./assets/badge-96.png','./assets/favicon.svg'];
 self.addEventListener('install',event=>{
  event.waitUntil((async()=>{
   const cache=await caches.open(CACHE_NAME);
@@ -48,7 +48,7 @@ self.addEventListener('push',event=>{
  } catch {}
  event.waitUntil(self.registration.showNotification(String(payload.title).slice(0,80),{
   body:String(payload.body).slice(0,180),icon:new URL('./assets/icon-192.png',SCOPE).href,
-  badge:new URL('./assets/icon-192.png',SCOPE).href,
+  badge:new URL('./assets/badge-96.png',SCOPE).href,
   tag:String(payload.tag||'5ahub-new-content').slice(0,120),
   data:{url:candidate.href}
  }));

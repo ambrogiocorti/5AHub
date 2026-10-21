@@ -68,7 +68,7 @@ function pageHead(kicker,title,subtitle,ctas=''){return `<div class="page-head">
 function adminTag(item){return String(item.id).startsWith('demo-')?'<span class="badge-example">ESEMPIO</span>':''}
 function shortcut(to,ico,t,sub){return `<button class="shortcut" data-route="${to}"><span class="mini-icon ${ico==='sparkles'?'teal':''}">${icon(ico)}</span><span><strong>${esc(t)}</strong><small>${esc(sub)}</small></span>${icon('chevron',17)}</button>`}
 // Le notifiche locali rilevano nuovi contenuti quando la pagina e' aperta.
-// Il push a sito chiuso richiede un servizio di invio server-side e non e' ancora attivo.
+// Gli avvisi push vengono inviati dal servizio Edge anche quando la PWA è chiusa.
 const ALERT_CACHE='5ahub.notice.items.v1';
 const LAST_CHECK='5ahub.notice.lastcheck.v1';
 const NOTIFY_PREF='5ahub.notice.desktop.v1';
@@ -87,7 +87,7 @@ function noticeCenter(){if(!state.notificationPanel)return '';
  <div class="notice-popover-bottom">${'Notification' in window && 'serviceWorker' in navigator?
  `<button class="button secondary small" data-action="enable-device-notices">${icon('bell',14)} ${state.notifyOptIn?'Disattiva notifiche push':'Attiva notifiche push'}</button><button class="button muted small" data-action="push-preferences">Preferenze</button>`:
  `<small>Il tuo browser non supporta gli avvisi del dispositivo.</small>`}
- <small>Dopo la configurazione del servizio push, gli avvisi arriveranno anche con l’app chiusa.</small></div></div>`}
+ <small>Attiva le notifiche su 5ahub.it per ricevere avvisi anche con l’app chiusa.</small></div></div>`}
 async function deviceNotice(item){
  if(!state.notifyOptIn||!('Notification' in window)||Notification.permission!=='granted'||document.visibilityState==='visible')return;
  try{if(window.HUB_PUSH && state.notifyOptIn)return;

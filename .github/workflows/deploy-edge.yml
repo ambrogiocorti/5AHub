@@ -1,6 +1,11 @@
 name: 5AHub · Distribuisci notifiche Supabase
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/hub-notifications/**'
+      - '.github/workflows/deploy-edge.yml'
 permissions:
   contents: read
 jobs:
@@ -40,5 +45,5 @@ jobs:
             "HUB_WEBHOOK_SECRET=$HUB_WEBHOOK_SECRET" \
             "VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY" \
             "VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY" \
-            "VAPID_SUBJECT=https://ambrogiocorti.github.io/5AHub/" \
+            "VAPID_SUBJECT=https://5ahub.it/" \
             "CALENDAR_ICAL_URL=$CALENDAR_ICAL_URL"

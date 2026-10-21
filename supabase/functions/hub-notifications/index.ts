@@ -9,7 +9,7 @@ const env=(k: string)=>Deno.env.get(k)?.trim()||'';
 const PROJECT=env('SUPABASE_URL').replace(/\/$/,'');
 const SERVICE_KEY=env('SUPABASE_SERVICE_ROLE_KEY')||(()=>{try{return JSON.parse(env('SUPABASE_SECRET_KEYS')).default||''}catch{return ''}})();
 const WEBHOOK_SECRET=env('HUB_WEBHOOK_SECRET');
-const SITE='https://ambrogiocorti.github.io/5AHub/';
+const SITE='https://5ahub.it/';
 const MAX_ATTEMPTS=7;
 
 type Item={id:number;category:string;title:string;body:string;route:string;author_id:string|null};
@@ -78,7 +78,7 @@ async function syncCalendar():Promise<{added:number;seeded:boolean}|{warning:str
 
 async function sendTo(sub:Subscriber, item:Item){
   const dest=new URL(item.route||'#/home',SITE);
-  if(dest.origin!==new URL(SITE).origin || !dest.pathname.startsWith('/5AHub/'))throw Error('Target non consentito');
+  if(dest.origin!==new URL(SITE).origin || !dest.pathname==='/')throw Error('Target non consentito');
   const payload=JSON.stringify({title:'5AHub · '+item.title.slice(0,100),body:(item.body||'Nuovo contenuto').slice(0,170),url:dest.href,tag:'5ahub-'+item.id});
   return webpush.sendNotification({endpoint:sub.endpoint,keys:{p256dh:sub.p256dh,auth:sub.auth_secret}},payload,{TTL:3600,urgency:'high'});
 }

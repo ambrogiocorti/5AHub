@@ -34,7 +34,7 @@ Nel progetto Supabase vai a **Edge Functions → Secrets**, e aggiungi:
 
 - `VAPID_PUBLIC_KEY`: uguale a quello già salvato nei GitHub Secrets e in `site/config.js`
 - `VAPID_PRIVATE_KEY`: la chiave **privata** corrispondente alla pubblica, già configurata per GitHub Actions
-- `VAPID_SUBJECT`: per esempio `https://ambrogiocorti.github.io/5AHub/` oppure `mailto:tuo-indirizzo@example.com`
+- `VAPID_SUBJECT`: per esempio `https://5ahub.it/` oppure `mailto:tuo-indirizzo@example.com`
 - `CALENDAR_ICAL_URL`: l'**indirizzo pubblico iCal** del calendario della classe, da Google Calendar → Impostazioni → Integra calendario (verifica che termini in `.ics` e che funzioni senza login)
 - `HUB_WEBHOOK_SECRET`: genera un valore casuale, almeno 32 byte, che dovrà essere **identico** al segreto Vault `hub_notify_token` creato al passo 3.
 
@@ -84,3 +84,11 @@ Il workflow GitHub in repository ha una condizione che lo disattiva quando quest
 - La chiave VAPID privata deve corrispondere alla chiave pubblica utilizzata quando gli studenti hanno attivato gli avvisi; se cambi coppia di chiavi, dovranno reinscriversi.
 - Senza login non è possibile verificare che tutti i visitatori siano davvero della classe; attiva le protezioni anti-abuso sul sito.
 - Le notifiche inviate ai dispositivi sono controllate anche dai sistemi operativi (permessi, batteria, rete, modalità Non disturbare): la consegna non è garantita in tempo reale.
+### Passaggio al dominio 5ahub.it (ottobre 2026)
+
+- L'indirizzo pubblico e i link Web Push puntano ora a **https://5ahub.it/**; **la stessa Edge Function e lo stesso database Supabase restano attivi**.
+- Le modifiche a `supabase/functions/hub-notifications/**` avviano automaticamente il workflow di distribuzione `deploy-edge.yml` su `main`. Verificare l'esito nella scheda GitHub Actions prima di eseguire un test.
+- Non cambiare le chiavi VAPID, il token di sicurezza né gli URL Vault `hub_notify_endpoint`/`hub_notify_token`: continuano a puntare alla funzione Supabase, non al dominio della PWA.
+- I dispositivi che ricevevano push dal vecchio dominio devono aprire **https://5ahub.it/**, reinstallare l'app se necessario e attivare nuovamente gli avvisi. Permessi browser e sottoscrizioni push non si spostano da un'origine a un'altra.
+- Creare un nuovo contenuto da un browser diverso per testare l'invio e verificare che la notifica apra `https://5ahub.it/#/...`.
+- Vecchie sottoscrizioni possono restare in archivio fino all'invalidazione; non cancellare indiscriminatamente le righe perché potrebbero esserci già nuove iscrizioni sul dominio aggiornato.

@@ -35,5 +35,5 @@ jobs:
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
           VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
           CALENDAR_ICAL_URL: ${{ secrets.CALENDAR_ICAL_URL }}
-          SITE_URL: https://ambrogiocorti.github.io/5AHub/
+          SITE_URL: https://5ahub.it/
         run: node worker.mjs

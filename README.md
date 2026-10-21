@@ -25,7 +25,7 @@ Se avevi già creato 5AHub prima di questo aggiornamento, devi eseguire nel **SQ
 
 Repository: https://github.com/ambrogiocorti/5AHub
 
-In **Settings → Pages → Build and deployment**, seleziona **GitHub Actions**. Il workflow in `.github/workflows/pages.yml` pubblica la cartella `site` su https://ambrogiocorti.github.io/5AHub/.
+In **Settings → Pages → Build and deployment**, seleziona **GitHub Actions**. Il workflow in `.github/workflows/pages.yml` pubblica la cartella `site` su https://5ahub.it/.
 
 ## Configurazione Supabase
 
@@ -49,19 +49,18 @@ La cartella `site/` include `manifest.webmanifest`, `sw.js` e icone PNG 192/512.
 
 Il Service Worker mantiene in cache il guscio grafico dell'app: **contenuti Supabase, Google Calendar e Google Forms richiedono internet**. Per testare la PWA va usato HTTPS o localhost, non un file aperto con `file://`.
 
-## Notifiche: versione implementata e limiti
+## Notifiche push immediate
 
-- La campanella conserva un elenco locale dei nuovi contenuti pubblicati (comunicazioni, materiali, orientamento, assemblee) rilevati **quando apri o tieni aperto 5AHub**. I nuovi post vengono ricevuti tramite Supabase Realtime, con aggiornamento periodico quando il sito è visibile.
-- Puoi abilitare **avvisi del dispositivo mentre il sito rimane aperto**. Serve permesso esplicito del browser; su iPhone la web app deve essere aggiunta alla schermata Home.
-- La sincronizzazione **push a sito completamente chiuso non è ancora attiva**: serve configurare sul server il Web Push (VAPID, sottoscrizioni per dispositivo, invio tramite Edge Function / server). Il Service Worker contiene già l'ascoltatore `push`.
-- **Google Calendar non alimenta automaticamente le notifiche**. Il calendario visualizzato è solo un iframe; per gli avvisi sui nuovi eventi occorre Google Calendar API / un trigger Google Apps Script + server Web Push. Non mettere credenziali OAuth, VAPID private o service_role nella repository pubblica.
-- Le notifiche di contenuto vengono memorizzate **soltanto sul dispositivo dell'utente** (storage locale). Eliminare dati del browser può far perdere storico e permessi.
+- **Materiali, comunicazioni, orientamento, assemblee:** i nuovi contenuti vengono inviati in push attraverso un trigger `pg_net` che chiama la Edge Function Supabase `hub-notifications` immediatamente dopo il salvataggio. Tempi di consegna soggetti al browser e alla rete.
+- **Google Calendar:** il job Supabase Cron `5ahub-calendar-one-minute` confronta il feed iCal ogni minuto e notifica i nuovi eventi. Il feed di Google può avere ritardi indipendenti.
+- **Campanella:** consente di abilitare/disabilitare le notifiche, consultare gli aggiornamenti recenti e impostare le preferenze per contenuti e calendario. Gli avvisi arrivano anche con la PWA chiusa, se il dispositivo supporta Web Push.
+- **Android:** icona monocromatica `site/assets/badge-96.png` con solo «5A»; l'aspetto può dipendere dal sistema operativo.
+- **Sicurezza:** le credenziali restano su Supabase/GitHub Actions Secrets, mai nel frontend. Non modificare la coppia VAPID per cambiare dominio.
 
-### Perché non inviare subito push a sito chiuso?
+### Dominio ufficiale
 
-GitHub Pages ospita solo file statici: non può eseguire codice server per mandare Web Push. Occorrono un server di invio, registrazione dei dispositivi e credenziali segrete conservate lato server. Un calendario Google dentro iframe non permette di intercettare direttamente la creazione di eventi. È necessario un secondo passaggio di configurazione lato backend prima di promettere questo comportamento agli studenti.
+Il sito ufficiale è **https://5ahub.it/**, configurato come custom domain di GitHub Pages. La Edge Function usa lo stesso dominio per i collegamenti nelle notifiche. Il codice della funzione viene distribuito automaticamente dal workflow `.github/workflows/deploy-edge.yml` quando cambia `supabase/functions/hub-notifications/**`.
 
+**Dopo il cambio di dominio:** le autorizzazioni e le sottoscrizioni Web Push del vecchio `ambrogiocorti.github.io` non vengono trasferite. Apri https://5ahub.it/ su ogni dispositivo, reinstalla la PWA dal nuovo dominio se necessario e riattiva le notifiche dalla campanella. Non serve cambiare la chiave VAPID. Le vecchie sottoscrizioni possono rimanere temporaneamente nel database fino alla scadenza o alla pulizia.
 
-## Notifiche più rapide (nuova architettura)
-
-Il servizio Edge di Supabase e la verifica calendario ogni minuto sono stati aggiunti al repository, ma **non si attivano solo pubblicando su GitHub**. Eseguire la procedura in [`ATTIVAZIONE_NOTIFICHE_IMMEDIATE.md`](./ATTIVAZIONE_NOTIFICHE_IMMEDIATE.md). Il precedente workflow GitHub resta disponibile come soluzione di transizione fino a quando non viene impostato `HUB_DELIVERY_MODE=supabase` in GitHub Actions Variables. Le notifiche Android usano `site/assets/badge-96.png` con soltanto «5A» bianco su trasparenza.
+Per la configurazione iniziale e la risoluzione degli errori consulta [ATTIVAZIONE_NOTIFICHE_IMMEDIATE.md](./ATTIVAZIONE_NOTIFICHE_IMMEDIATE.md). Il vecchio workflow GitHub programmato è disabilitato quando la variabile `HUB_DELIVERY_MODE` vale `supabase`.

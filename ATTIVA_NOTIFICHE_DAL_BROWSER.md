@@ -48,3 +48,7 @@ Se avevi già eseguito lo script, non ricreare due segreti con lo stesso nome: g
 Per i dettagli consulta [ATTIVAZIONE_NOTIFICHE_IMMEDIATE.md](./ATTIVAZIONE_NOTIFICHE_IMMEDIATE.md).
 
 **Nota:** il link pubblico del sito non richiede login, ma non consente di limitare l'accesso ai soli compagni. Le notifiche dipendono dalle impostazioni del dispositivo; l’intervallo di controllo è un minuto, non un tempo di consegna garantito.
+
+## Cambio dominio (5ahub.it)
+
+Il sito e i collegamenti push usano ora `https://5ahub.it/`. L'endpoint Supabase in Vault non cambia. La distribuzione della funzione parte automaticamente se cambia il codice su GitHub (`main`). Riattiva le notifiche dal nuovo dominio; gli abbonamenti del vecchio URL non sono trasferibili automaticamente.
